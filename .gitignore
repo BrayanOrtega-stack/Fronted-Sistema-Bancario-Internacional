@@ -1,0 +1,6 @@
+/dist
+/node_modules
+.angular/
+*.log
+.vscode/
+.DS_Store
