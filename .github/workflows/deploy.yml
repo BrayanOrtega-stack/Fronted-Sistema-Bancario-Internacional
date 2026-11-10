@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: banco-internacional-frontend
+  labels:
+    app: banco-internacional-frontend
+    app.kubernetes.io/part-of: banco-internacional
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: banco-internacional-frontend
+  template:
+    metadata:
+      labels:
+        app: banco-internacional-frontend
+    spec:
+      containers:
+        - name: frontend
+          image: image-registry.openshift-image-registry.svc:5000/banco-internacional/frontend:latest
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+          resources:
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+            requests:
+              cpu: "100m"
+              memory: "256Mi"
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8080
+            initialDelaySeconds: 15
+            periodSeconds: 20
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: banco-internacional-frontend-svc
+  labels:
+    app: banco-internacional-frontend
+spec:
+  ports:
+    - name: 8080-tcp
+      port: 8080
+      targetPort: 8080
+  selector:
+    app: banco-internacional-frontend
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: banco-internacional-frontend-route
+  labels:
+    app: banco-internacional-frontend
+spec:
+  to:
+    kind: Service
+    name: banco-internacional-frontend-svc
+    weight: 100
+  port:
+    targetPort: 8080-tcp
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
