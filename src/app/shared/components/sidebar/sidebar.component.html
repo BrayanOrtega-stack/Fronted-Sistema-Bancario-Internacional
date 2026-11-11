@@ -1,0 +1,26 @@
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <span class="sidebar-logo">BI</span>
+    <div class="sidebar-brand-text">
+      <strong>Banco Internacional</strong>
+      <small>Banca Corporativa</small>
+    </div>
+  </div>
+
+  <nav class="sidebar-nav">
+    @for (enlace of enlaces; track enlace.ruta) {
+      <a
+        [routerLink]="enlace.ruta"
+        routerLinkActive="activo"
+        class="sidebar-link"
+      >
+        <span class="sidebar-icono">{{ enlace.icono }}</span>
+        <span>{{ enlace.etiqueta }}</span>
+      </a>
+    }
+  </nav>
+
+  <div class="sidebar-footer">
+    <p>Seguridad bancaria<br />de nivel internacional</p>
+  </div>
+</aside>

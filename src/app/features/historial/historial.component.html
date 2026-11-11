@@ -1,0 +1,78 @@
+<section class="historial">
+  <header class="historial-header">
+    <h1>Historial de Transacciones Globales</h1>
+    <p>Consulta y filtra todos tus movimientos internacionales</p>
+  </header>
+
+  <!-- Filtros -->
+  <form class="card filtros-card" [formGroup]="filtroForm">
+    <div class="filtros-grid">
+      <div class="campo">
+        <label for="fechaDesde">Desde</label>
+        <input id="fechaDesde" type="date" formControlName="fechaDesde" />
+      </div>
+      <div class="campo">
+        <label for="fechaHasta">Hasta</label>
+        <input id="fechaHasta" type="date" formControlName="fechaHasta" />
+      </div>
+      <div class="campo">
+        <label for="divisa">Divisa</label>
+        <select id="divisa" formControlName="divisa">
+          @for (d of divisasDisponibles; track d) {
+            <option [value]="d">{{ d }}</option>
+          }
+        </select>
+      </div>
+      <div class="campo">
+        <label for="estado">Estado</label>
+        <select id="estado" formControlName="estado">
+          @for (e of estadosDisponibles; track e) {
+            <option [value]="e">{{ e }}</option>
+          }
+        </select>
+      </div>
+      <div class="campo campo-boton">
+        <button type="button" class="btn btn-secondary" (click)="limpiarFiltros()">Limpiar filtros</button>
+      </div>
+    </div>
+  </form>
+
+  <!-- Tabla de transacciones -->
+  <div class="card tabla-card">
+    <div class="tabla-wrapper">
+      <table class="tabla-transacciones">
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Descripción</th>
+            <th>Beneficiario</th>
+            <th>País</th>
+            <th>Tipo</th>
+            <th>Divisa</th>
+            <th>Monto</th>
+            <th>Estado</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (t of transaccionesFiltradas; track t.id) {
+            <tr>
+              <td>{{ t.fecha }}</td>
+              <td>{{ t.descripcion }}</td>
+              <td>{{ t.beneficiario || '—' }}</td>
+              <td>{{ t.pais || '—' }}</td>
+              <td>{{ t.tipo }}</td>
+              <td>{{ t.divisa }}</td>
+              <td>{{ t.monto | number: '1.2-2' }}</td>
+              <td><span [class]="claseEstado(t.estado)">{{ t.estado }}</span></td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="8" class="tabla-vacia">No se encontraron transacciones con los filtros seleccionados.</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <p class="tabla-contador">{{ transaccionesFiltradas.length }} transacción(es) encontradas</p>
+  </div>
+</section>

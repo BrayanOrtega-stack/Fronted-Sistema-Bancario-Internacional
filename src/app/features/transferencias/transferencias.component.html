@@ -1,0 +1,130 @@
+<section class="transferencias">
+  <header class="transferencias-header">
+    <h1>Transferencias Internacionales</h1>
+    <p>Envía fondos de forma segura a cualquier banco del mundo</p>
+  </header>
+
+  @if (transferenciaExitosa) {
+    <div class="alerta alerta-exito">
+      ✓ Tu transferencia fue registrada y está siendo procesada.
+    </div>
+  }
+
+  <div class="transferencias-grid">
+    <!-- Formulario -->
+    <form class="card formulario-card" [formGroup]="formulario" (ngSubmit)="enviarFormulario()">
+      <h3>Datos del Beneficiario</h3>
+
+      <div class="campo">
+        <label for="nombreCompleto">Nombre del beneficiario *</label>
+        <input id="nombreCompleto" type="text" formControlName="nombreCompleto" placeholder="Ej. Juan Pérez García" />
+        @if (campoInvalido('nombreCompleto')) {
+          <span class="error">Ingresa el nombre completo del beneficiario (mín. 3 caracteres).</span>
+        }
+      </div>
+
+      <div class="campo-grid">
+        <div class="campo">
+          <label for="numeroCuentaIban">Número de cuenta / IBAN *</label>
+          <input id="numeroCuentaIban" type="text" formControlName="numeroCuentaIban" placeholder="ES91 2100 0418..." />
+          @if (campoInvalido('numeroCuentaIban')) {
+            <span class="error">Número de cuenta o IBAN inválido.</span>
+          }
+        </div>
+
+        <div class="campo">
+          <label for="codigoSwiftBic">Código SWIFT / BIC *</label>
+          <input id="codigoSwiftBic" type="text" formControlName="codigoSwiftBic" placeholder="CAIXESBBXXX" />
+          @if (campoInvalido('codigoSwiftBic')) {
+            <span class="error">Código SWIFT/BIC inválido (8 a 11 caracteres alfanuméricos).</span>
+          }
+        </div>
+      </div>
+
+      <div class="campo-grid">
+        <div class="campo">
+          <label for="bancoDestino">Banco destino *</label>
+          <input id="bancoDestino" type="text" formControlName="bancoDestino" placeholder="Ej. Banco Santander" />
+          @if (campoInvalido('bancoDestino')) {
+            <span class="error">Ingresa el banco destino.</span>
+          }
+        </div>
+
+        <div class="campo">
+          <label for="pais">País *</label>
+          <input id="pais" type="text" formControlName="pais" placeholder="Ej. España" />
+          @if (campoInvalido('pais')) {
+            <span class="error">Ingresa el país destino.</span>
+          }
+        </div>
+      </div>
+
+      <h3 class="separador">Monto y Divisas</h3>
+
+      <div class="campo-grid campo-grid-3">
+        <div class="campo">
+          <label for="divisaOrigen">Divisa de origen</label>
+          <select id="divisaOrigen" formControlName="divisaOrigen">
+            @for (d of divisas; track d.codigo) {
+              <option [value]="d.codigo">{{ d.codigo }} - {{ d.nombre }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="campo">
+          <label for="divisaDestino">Divisa de destino</label>
+          <select id="divisaDestino" formControlName="divisaDestino">
+            @for (d of divisas; track d.codigo) {
+              <option [value]="d.codigo">{{ d.codigo }} - {{ d.nombre }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="campo">
+          <label for="monto">Monto a enviar *</label>
+          <input id="monto" type="number" formControlName="monto" min="1" placeholder="0.00" />
+          @if (campoInvalido('monto')) {
+            <span class="error">Ingresa un monto válido mayor a 0.</span>
+          }
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-enviar" [disabled]="enviando">
+        {{ enviando ? 'Procesando...' : 'Enviar Transferencia' }}
+      </button>
+    </form>
+
+    <!-- Simulador de tasa de cambio -->
+    <div class="card simulador-card">
+      <h3>Simulador de Tasa de Cambio</h3>
+
+      @if (simulacion) {
+        <div class="simulador-resultado">
+          <div class="simulador-fila">
+            <span>Monto enviado</span>
+            <strong>{{ formulario.value.monto | number: '1.2-2' }} {{ formulario.value.divisaOrigen }}</strong>
+          </div>
+          <div class="simulador-fila">
+            <span>Comisión internacional</span>
+            <strong class="texto-resta">- {{ simulacion.comision | number: '1.2-2' }} {{ formulario.value.divisaOrigen }}</strong>
+          </div>
+          <div class="simulador-fila">
+            <span>Monto neto a convertir</span>
+            <strong>{{ simulacion.montoNetoOrigen | number: '1.2-2' }} {{ formulario.value.divisaOrigen }}</strong>
+          </div>
+          <div class="simulador-divisor"></div>
+          <div class="simulador-fila">
+            <span>Tasa de cambio</span>
+            <strong>1 {{ formulario.value.divisaOrigen }} = {{ simulacion.tasa | number: '1.4-4' }} {{ formulario.value.divisaDestino }}</strong>
+          </div>
+          <div class="simulador-fila simulador-total">
+            <span>El beneficiario recibirá</span>
+            <strong>{{ simulacion.montoConvertido | number: '1.2-2' }} {{ formulario.value.divisaDestino }}</strong>
+          </div>
+        </div>
+      } @else {
+        <p class="simulador-vacio">Ingresa un monto para ver la simulación de la tasa de cambio y la comisión internacional.</p>
+      }
+    </div>
+  </div>
+</section>

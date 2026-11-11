@@ -1,0 +1,86 @@
+<section class="dashboard">
+  <header class="dashboard-header">
+    <h1>Dashboard Principal</h1>
+    <p>Vista consolidada de tus cuentas en múltiples divisas</p>
+  </header>
+
+  <!-- Saldos consolidados -->
+  <div class="saldos-grid">
+    @for (cuenta of cuentas; track cuenta.id) {
+      <div class="card saldo-card">
+        <div class="saldo-card-top">
+          <span class="saldo-divisa">{{ cuenta.divisa }}</span>
+          <span class="saldo-tipo">{{ cuenta.tipo }}</span>
+        </div>
+        <h3>{{ formatearSaldo(cuenta) }}</h3>
+        <p class="saldo-alias">{{ cuenta.alias }}</p>
+        <p class="saldo-numero">{{ cuenta.numeroCuenta }}</p>
+      </div>
+    }
+  </div>
+
+  <div class="dashboard-grid">
+    <!-- Gráfico ingresos/egresos -->
+    <div class="card grafico-card">
+      <h3>Ingresos vs Egresos (últimos 6 meses)</h3>
+      <div class="grafico">
+        @for (m of movimientos; track m.mes) {
+          <div class="grafico-columna">
+            <div class="grafico-barras">
+              <div class="barra barra-ingreso" [style.height]="alturaBarra(m.ingresos)" [title]="'Ingresos: ' + m.ingresos"></div>
+              <div class="barra barra-egreso" [style.height]="alturaBarra(m.egresos)" [title]="'Egresos: ' + m.egresos"></div>
+            </div>
+            <span class="grafico-mes">{{ m.mes }}</span>
+          </div>
+        }
+      </div>
+      <div class="grafico-leyenda">
+        <span><i class="punto punto-ingreso"></i> Ingresos</span>
+        <span><i class="punto punto-egreso"></i> Egresos</span>
+      </div>
+    </div>
+
+    <!-- Accesos rápidos -->
+    <div class="card accesos-card">
+      <h3>Accesos Rápidos</h3>
+      <div class="accesos-lista">
+        @for (acceso of accesosRapidos; track acceso.etiqueta) {
+          <a [routerLink]="acceso.ruta" class="acceso-item">
+            <span class="acceso-icono">{{ acceso.icono }}</span>
+            <span>{{ acceso.etiqueta }}</span>
+          </a>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- Últimas transacciones -->
+  <div class="card ultimas-card">
+    <div class="ultimas-header">
+      <h3>Movimientos Recientes</h3>
+      <a routerLink="/historial">Ver historial completo →</a>
+    </div>
+    <table class="tabla-mini">
+      <thead>
+        <tr>
+          <th>Fecha</th>
+          <th>Descripción</th>
+          <th>Divisa</th>
+          <th>Monto</th>
+          <th>Estado</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (t of ultimasTransacciones; track t.id) {
+          <tr>
+            <td>{{ t.fecha }}</td>
+            <td>{{ t.descripcion }}</td>
+            <td>{{ t.divisa }}</td>
+            <td>{{ t.monto | number: '1.2-2' }}</td>
+            <td><span [class]="claseEstado(t.estado)">{{ t.estado }}</span></td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</section>

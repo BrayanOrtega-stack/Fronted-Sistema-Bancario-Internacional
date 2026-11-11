@@ -1,0 +1,70 @@
+.historial-header { margin-bottom: 20px; }
+.historial-header p { color: var(--color-gris-700); }
+
+.filtros-card { margin-bottom: 16px; }
+
+.filtros-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 14px;
+  align-items: end;
+}
+
+.campo { margin: 0; }
+.campo-boton { display: flex; }
+.campo-boton .btn { width: 100%; }
+
+.tabla-card { padding: 0; overflow: hidden; }
+
+.tabla-wrapper {
+  overflow-x: auto;
+}
+
+.tabla-transacciones {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 760px;
+  font-size: 0.88rem;
+}
+
+.tabla-transacciones thead {
+  background: var(--color-gris-100);
+}
+
+.tabla-transacciones th {
+  text-align: left;
+  padding: 14px 16px;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--color-gris-700);
+  white-space: nowrap;
+}
+
+.tabla-transacciones td {
+  padding: 14px 16px;
+  border-top: 1px solid var(--color-gris-100);
+  white-space: nowrap;
+}
+
+.tabla-vacia {
+  text-align: center;
+  color: var(--color-gris-700);
+  padding: 30px 16px !important;
+}
+
+.tabla-contador {
+  padding: 12px 16px;
+  font-size: 0.8rem;
+  color: var(--color-gris-700);
+  border-top: 1px solid var(--color-gris-100);
+  margin: 0;
+}
+
+@media (max-width: 900px) {
+  .filtros-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 500px) {
+  .filtros-grid { grid-template-columns: 1fr; }
+}

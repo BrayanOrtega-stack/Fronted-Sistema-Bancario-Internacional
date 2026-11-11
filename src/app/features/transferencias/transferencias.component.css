@@ -1,0 +1,96 @@
+.transferencias-header { margin-bottom: 20px; }
+.transferencias-header p { color: var(--color-gris-700); }
+
+.alerta {
+  padding: 14px 16px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+.alerta-exito {
+  background: #e3f5ec;
+  color: var(--color-exito);
+}
+
+.transferencias-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 16px;
+  align-items: start;
+}
+
+.formulario-card h3 {
+  font-size: 1rem;
+  margin-bottom: 14px;
+}
+.separador { margin-top: 20px; }
+
+.campo { margin-bottom: 16px; }
+
+.campo-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.campo-grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+
+.error {
+  display: block;
+  color: var(--color-rechazado);
+  font-size: 0.78rem;
+  margin-top: 4px;
+}
+
+.btn-enviar {
+  width: 100%;
+  padding: 13px;
+  font-size: 0.95rem;
+  margin-top: 8px;
+}
+.btn-enviar:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.simulador-card {
+  position: sticky;
+  top: 20px;
+  background: var(--color-azul-oscuro);
+  color: var(--color-blanco);
+}
+.simulador-card h3 { color: var(--color-blanco); margin-bottom: 16px; }
+
+.simulador-vacio {
+  color: var(--color-gris-400);
+  font-size: 0.88rem;
+}
+
+.simulador-resultado { display: flex; flex-direction: column; gap: 10px; }
+
+.simulador-fila {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+  color: var(--color-gris-400);
+}
+.simulador-fila strong { color: var(--color-blanco); font-weight: 600; }
+.texto-resta { color: #ff9f9f !important; }
+
+.simulador-divisor {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.15);
+  margin: 4px 0;
+}
+
+.simulador-total {
+  margin-top: 6px;
+  padding-top: 10px;
+  border-top: 1px dashed rgba(255, 255, 255, 0.2);
+  font-size: 0.95rem;
+}
+.simulador-total strong { color: var(--color-acento); font-size: 1.2rem; }
+
+@media (max-width: 900px) {
+  .transferencias-grid { grid-template-columns: 1fr; }
+  .campo-grid, .campo-grid-3 { grid-template-columns: 1fr; }
+  .simulador-card { position: static; }
+}
