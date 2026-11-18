@@ -41,7 +41,7 @@ export class TransaccionService {
                 tipo: (m.tipo === 'transf_intl' ? 'Transferencia Internacional' : m.tipo || 'Transferencia Internacional') as any,
                 estado: 'Completada',
               }));
-              this.transacciones = [...desdeDb, ...this.transaccionesDemo];
+              this.transacciones.splice(0, this.transacciones.length, ...desdeDb, ...this.transaccionesDemo);
             },
             error: (err) => console.error('Error cargando movimientos:', err),
           });
