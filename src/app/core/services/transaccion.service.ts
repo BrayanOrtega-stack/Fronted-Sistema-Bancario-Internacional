@@ -7,7 +7,7 @@ export class TransaccionService {
   private apiUrl = 'https://stack-backend-banco-git-matias-or-dev.apps.rm2.thpm.p1.openshiftapps.com/api';
   private cuentaActiva: string | null = null;
 
-  private transacciones: Transaccion[] = [
+  private transaccionesDemo: Transaccion[] = [
     { id: 't1', fecha: '2026-11-01', descripcion: 'Transferencia a proveedor', beneficiario: 'Global Tech Supplies', pais: 'Alemania', divisa: 'EUR', monto: 3200, tipo: 'Transferencia Internacional', estado: 'Completada' },
     { id: 't2', fecha: '2026-10-29', descripcion: 'Pago de nómina remota', beneficiario: 'Laura Fernández', pais: 'España', divisa: 'EUR', monto: 1850, tipo: 'Transferencia Internacional', estado: 'Completada' },
     { id: 't3', fecha: '2026-10-25', descripcion: 'Transferencia pendiente de validación', beneficiario: 'Andes Import SAS', pais: 'Colombia', divisa: 'COP', monto: 5200000, tipo: 'Transferencia Internacional', estado: 'Pendiente' },
@@ -17,6 +17,8 @@ export class TransaccionService {
     { id: 't7', fecha: '2026-10-05', descripcion: 'Retiro cajero internacional', divisa: 'EUR', monto: 300, tipo: 'Retiro', estado: 'Completada' },
     { id: 't8', fecha: '2026-09-28', descripcion: 'Transferencia a socio comercial', beneficiario: 'Pacific Imports Co.', pais: 'México', divisa: 'USD', monto: 980, tipo: 'Transferencia Internacional', estado: 'Pendiente' },
   ];
+
+  private transacciones: Transaccion[] = [...this.transaccionesDemo];
 
   constructor(private http: HttpClient) {
     this.cargarMovimientosDesdeApi();
@@ -29,18 +31,17 @@ export class TransaccionService {
           this.cuentaActiva = String(cuentas[0].num_cuenta);
           this.http.get<any[]>(`${this.apiUrl}/movimientos/${this.cuentaActiva}`).subscribe({
             next: (movs) => {
-              if (movs && movs.length > 0) {
-                this.transacciones = movs.map((m, idx) => ({
-                  id: String(m.id_transaccion || `db-${idx}`),
-                  fecha: m.fecha_hora ? String(m.fecha_hora).slice(0, 10) : new Date().toISOString().slice(0, 10),
-                  descripcion: m.descripcion || 'Movimiento bancario',
-                  beneficiario: m.num_cuenta_destino || undefined,
-                  divisa: (m.codigo_moneda || m.codigo_iso || 'USD') as any,
-                  monto: Number(m.monto),
-                  tipo: (m.tipo === 'transf_intl' ? 'Transferencia Internacional' : m.tipo || 'Transferencia Internacional') as any,
-                  estado: 'Completada',
-                }));
-              }
+              const desdeDb: Transaccion[] = (movs || []).map((m, idx) => ({
+                id: String(m.id_transaccion || `db-${idx}`),
+                fecha: m.fecha_hora ? String(m.fecha_hora).slice(0, 10) : new Date().toISOString().slice(0, 10),
+                descripcion: m.descripcion || 'Movimiento bancario',
+                beneficiario: m.num_cuenta_destino || undefined,
+                divisa: (m.codigo_moneda || m.codigo_iso || 'USD') as any,
+                monto: Number(m.monto),
+                tipo: (m.tipo === 'transf_intl' ? 'Transferencia Internacional' : m.tipo || 'Transferencia Internacional') as any,
+                estado: 'Completada',
+              }));
+              this.transacciones = [...desdeDb, ...this.transaccionesDemo];
             },
             error: (err) => console.error('Error cargando movimientos:', err),
           });
@@ -65,8 +66,6 @@ export class TransaccionService {
   }
 
   registrarTransferencia(transaccion: Transaccion): void {
-    this.transacciones.unshift(transaccion);
-
     if (this.cuentaActiva) {
       const payload = {
         tipo: 'transf_intl',
@@ -80,6 +79,8 @@ export class TransaccionService {
         next: () => this.cargarMovimientosDesdeApi(),
         error: (err) => console.error('Error guardando transacción en PostgreSQL:', err),
       });
+    } else {
+      this.transacciones.unshift(transaccion);
     }
   }
 }
