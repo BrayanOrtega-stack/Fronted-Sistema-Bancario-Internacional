@@ -31,9 +31,9 @@ export class CuentaService {
         if (datos && datos.length > 0) {
           this.cuentas = datos.map((c) => ({
             id: String(c.num_cuenta),
-            alias: `Cuenta ${c.codigo_iso} (${c.num_cuenta})`,
+            alias: `Cuenta ${c.codigo_moneda} (${c.num_cuenta})`,
             numeroCuenta: String(c.num_cuenta),
-            divisa: c.codigo_iso,
+            divisa: c.codigo_moneda,
             saldo: Number(c.saldo),
             tipo: c.id_tipo_cuenta === 1 ? 'Ahorros' : 'Corriente',
           }));
