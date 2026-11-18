@@ -1,8 +1,11 @@
 import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { Cuenta, MovimientoResumen } from '../models/cuenta.model';
 
 @Injectable({ providedIn: 'root' })
 export class CuentaService {
+  private apiUrl = 'https://stack-backend-banco-git-matias-or-dev.apps.rm2.thpm.p1.openshiftapps.com/api';
+
   private cuentas: Cuenta[] = [
     { id: 'c1', alias: 'Cuenta Principal USD', numeroCuenta: '****4821', divisa: 'USD', saldo: 18540.32, tipo: 'Corriente' },
     { id: 'c2', alias: 'Cuenta Ahorros EUR', numeroCuenta: '****7733', divisa: 'EUR', saldo: 9210.50, tipo: 'Ahorros' },
@@ -17,6 +20,28 @@ export class CuentaService {
     { mes: 'Oct', ingresos: 6600, egresos: 4700 },
     { mes: 'Nov', ingresos: 7800, egresos: 4100 },
   ];
+
+  constructor(private http: HttpClient) {
+    this.cargarCuentasDesdeApi();
+  }
+
+  cargarCuentasDesdeApi(): void {
+    this.http.get<any[]>(`${this.apiUrl}/cuentas`).subscribe({
+      next: (datos) => {
+        if (datos && datos.length > 0) {
+          this.cuentas = datos.map((c) => ({
+            id: String(c.num_cuenta),
+            alias: `Cuenta ${c.codigo_iso} (${c.num_cuenta})`,
+            numeroCuenta: String(c.num_cuenta),
+            divisa: c.codigo_iso,
+            saldo: Number(c.saldo),
+            tipo: c.id_tipo_cuenta === 1 ? 'Ahorros' : 'Corriente',
+          }));
+        }
+      },
+      error: (err) => console.error('Error cargando cuentas desde OpenShift:', err),
+    });
+  }
 
   obtenerCuentas(): Cuenta[] {
     return this.cuentas;
