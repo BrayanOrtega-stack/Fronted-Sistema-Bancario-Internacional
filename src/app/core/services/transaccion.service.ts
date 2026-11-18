@@ -35,7 +35,7 @@ export class TransaccionService {
                   fecha: m.fecha_hora ? String(m.fecha_hora).slice(0, 10) : new Date().toISOString().slice(0, 10),
                   descripcion: m.descripcion || 'Movimiento bancario',
                   beneficiario: m.num_cuenta_destino || undefined,
-                  divisa: (m.codigo_iso || 'USD') as any,
+                  divisa: (m.codigo_moneda || m.codigo_iso || 'USD') as any,
                   monto: Number(m.monto),
                   tipo: (m.tipo || 'Transferencia Internacional') as any,
                   estado: 'Completada',
@@ -71,7 +71,7 @@ export class TransaccionService {
       const payload = {
         tipo: 'transferencia',
         num_cuenta: this.cuentaActiva,
-        num_cuenta_destino: transaccion.beneficiario || null,
+        num_cuenta_destino: null,
         monto: transaccion.monto,
         descripcion: `${transaccion.descripcion}${transaccion.pais ? ' - ' + transaccion.pais : ''}`,
       };
