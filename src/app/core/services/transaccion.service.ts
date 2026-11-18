@@ -37,7 +37,7 @@ export class TransaccionService {
                   beneficiario: m.num_cuenta_destino || undefined,
                   divisa: (m.codigo_moneda || m.codigo_iso || 'USD') as any,
                   monto: Number(m.monto),
-                  tipo: (m.tipo || 'Transferencia Internacional') as any,
+                  tipo: (m.tipo === 'transf_intl' ? 'Transferencia Internacional' : m.tipo || 'Transferencia Internacional') as any,
                   estado: 'Completada',
                 }));
               }
@@ -69,7 +69,7 @@ export class TransaccionService {
 
     if (this.cuentaActiva) {
       const payload = {
-        tipo: 'transferencia',
+        tipo: 'transf_intl',
         num_cuenta: this.cuentaActiva,
         num_cuenta_destino: null,
         monto: transaccion.monto,
