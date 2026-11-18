@@ -1,8 +1,12 @@
 import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { Transaccion, FiltroTransacciones } from '../models/transaccion.model';
 
 @Injectable({ providedIn: 'root' })
 export class TransaccionService {
+  private apiUrl = 'https://stack-backend-banco-git-matias-or-dev.apps.rm2.thpm.p1.openshiftapps.com/api';
+  private cuentaActiva: string | null = null;
+
   private transacciones: Transaccion[] = [
     { id: 't1', fecha: '2026-11-01', descripcion: 'Transferencia a proveedor', beneficiario: 'Global Tech Supplies', pais: 'Alemania', divisa: 'EUR', monto: 3200, tipo: 'Transferencia Internacional', estado: 'Completada' },
     { id: 't2', fecha: '2026-10-29', descripcion: 'Pago de nómina remota', beneficiario: 'Laura Fernández', pais: 'España', divisa: 'EUR', monto: 1850, tipo: 'Transferencia Internacional', estado: 'Completada' },
@@ -13,6 +17,38 @@ export class TransaccionService {
     { id: 't7', fecha: '2026-10-05', descripcion: 'Retiro cajero internacional', divisa: 'EUR', monto: 300, tipo: 'Retiro', estado: 'Completada' },
     { id: 't8', fecha: '2026-09-28', descripcion: 'Transferencia a socio comercial', beneficiario: 'Pacific Imports Co.', pais: 'México', divisa: 'USD', monto: 980, tipo: 'Transferencia Internacional', estado: 'Pendiente' },
   ];
+
+  constructor(private http: HttpClient) {
+    this.cargarMovimientosDesdeApi();
+  }
+
+  cargarMovimientosDesdeApi(): void {
+    this.http.get<any[]>(`${this.apiUrl}/cuentas`).subscribe({
+      next: (cuentas) => {
+        if (cuentas && cuentas.length > 0) {
+          this.cuentaActiva = String(cuentas[0].num_cuenta);
+          this.http.get<any[]>(`${this.apiUrl}/movimientos/${this.cuentaActiva}`).subscribe({
+            next: (movs) => {
+              if (movs && movs.length > 0) {
+                this.transacciones = movs.map((m, idx) => ({
+                  id: String(m.id_transaccion || `db-${idx}`),
+                  fecha: m.fecha_hora ? String(m.fecha_hora).slice(0, 10) : new Date().toISOString().slice(0, 10),
+                  descripcion: m.descripcion || 'Movimiento bancario',
+                  beneficiario: m.num_cuenta_destino || undefined,
+                  divisa: (m.codigo_iso || 'USD') as any,
+                  monto: Number(m.monto),
+                  tipo: (m.tipo || 'Transferencia Internacional') as any,
+                  estado: 'Completada',
+                }));
+              }
+            },
+            error: (err) => console.error('Error cargando movimientos:', err),
+          });
+        }
+      },
+      error: (err) => console.error('Error consultando cuentas para movimientos:', err),
+    });
+  }
 
   obtenerTransacciones(): Transaccion[] {
     return this.transacciones;
@@ -30,5 +66,20 @@ export class TransaccionService {
 
   registrarTransferencia(transaccion: Transaccion): void {
     this.transacciones.unshift(transaccion);
+
+    if (this.cuentaActiva) {
+      const payload = {
+        tipo: 'transferencia',
+        num_cuenta: this.cuentaActiva,
+        num_cuenta_destino: transaccion.beneficiario || null,
+        monto: transaccion.monto,
+        descripcion: `${transaccion.descripcion}${transaccion.pais ? ' - ' + transaccion.pais : ''}`,
+      };
+
+      this.http.post(`${this.apiUrl}/transacciones`, payload).subscribe({
+        next: () => this.cargarMovimientosDesdeApi(),
+        error: (err) => console.error('Error guardando transacción en PostgreSQL:', err),
+      });
+    }
   }
 }
